@@ -5,3 +5,5 @@ The dictionary was compiled in 2020 by P. Magomedgadzhieva and M. Daniel (Lingui
 Please cite as following:
 
 Magomedgazhieva, P. and G. Moroz (2023). Dictionary of the Tukita (v2.0.0). Moscow. http://lingconlab.ru/TukitaDict/.
+
+The previous version is available [here](https://github.com/leramorozova/MinorLangDict).
