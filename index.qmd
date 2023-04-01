@@ -1,0 +1,70 @@
+---
+title: "Dictionary of the Tukita"
+format: html
+editor: source
+css: styles.css
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r}
+#| include: false
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+The dictionary was compiled in 2020 by P. Magomedgadzhieva and M. Daniel (Linguistic Convergence Laboratory, HSE University) and afterwords corrected in 2023. The online version originally was created by V. Morozova and then remade by G. Moroz. The compilation of the dictionaries was supported by the University of Jena and by the Basic Research Program at the National Research University "Higher School of Economics" (HSE) as part of the Russian Academic Excellence Project '5-100'.
+
+Please refer to the dictionary as follows:
+
+```{r}
+library(RefManageR)
+BibOptions(check.entries = FALSE, style = 'text', bib.style = 'authoryear')
+article_citation <- BibEntry(bibtype = 'misc', 
+ key='magomedgadzhieva2023',
+ title='Dictionary of the Tukita (v2.0.0)',
+ author='Patimat Magomedgazhieva and George Moroz',
+ year='2023',
+ publisher='Linguistic Convergence Laboratory, NRU HSE',
+ address='Moscow',
+ url='http://lingconlab.ru/TukitaDict/')
+```
+
+::: {.panel-tabset}
+
+### Plain text
+```{r, results = 'asis'}
+print(article_citation, .opts = list(style = 'text'))
+```
+
+### BibTeX
+
+```{r}
+print(article_citation, .opts = list(style = 'Bibtex'))
+```
+
+:::
+
+```{r}
+#| echo: false
+#| warning: false
+library(tidyverse)
+library(DT)
+library(glue)
+
+read_csv("data/data.csv", show_col_types = FALSE) %>%
+  mutate_all(function(i){ifelse(is.na(i), "", i)}) %>% 
+  mutate(tooltip = str_c(prs, form2, form3, additional_forms, sep = "; "),
+         tooltip = str_remove(tooltip, "^; "),
+         tooltip = str_remove(tooltip, ";$"),
+         tooltip_russian = str_c(meaning, context, sep = "; "),
+         tooltip_id = str_c(str_c("kk:&nbsp;", kk), 
+                            str_c("jena200:&nbsp;", jena200), 
+                            str_c("gld110:&nbsp;", gld110), sep = "; "),
+         orthography = glue('<a href="#" data-tooltip data-tooltip-message="{tooltip}">{orthography}</a>'),
+         Russian = glue('<a href="#" data-tooltip data-tooltip-message="{tooltip_russian}">{Russian}</a>'),
+         id = glue('<a href="#" data-tooltip data-tooltip-message="{tooltip_id}">{id}</a>')) %>% 
+  select(-prs, -form2, -form3, -additional_forms, -tooltip, -meaning, -context, -tooltip_russian, -tooltip_id, -kk, -jena200, -gld110) %>% 
+  DT::datatable(filter = 'top', rownames = FALSE, options = list(pageLength = 10, dom = 'tip'), escape = FALSE)
+```
+
+

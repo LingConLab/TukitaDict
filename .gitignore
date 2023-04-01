@@ -1,0 +1,8 @@
+.Rproj.user/*
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+*.~lock.*
+data/raw_data.csv
+data/code.R
