@@ -22,7 +22,7 @@ BibOptions(check.entries = FALSE, style = 'text', bib.style = 'authoryear')
 article_citation <- BibEntry(bibtype = 'misc', 
  key='magomedgadzhieva2023',
  title='Dictionary of the Tukita (v2.0.0)',
- author='Patimat Magomedgazhieva and George Moroz',
+ author='Patimat Magomedgazhieva and Michael Daniel',
  year='2023',
  publisher='Linguistic Convergence Laboratory, NRU HSE',
  address='Moscow',
@@ -47,24 +47,63 @@ print(article_citation, .opts = list(style = 'Bibtex'))
 ```{r}
 #| echo: false
 #| warning: false
+
 library(tidyverse)
 library(DT)
 library(glue)
 
+js_initComplete <- c(
+  "function(settings){",
+  "  var instance = settings.oInstance;",
+  "  var table = instance.api();",
+  "  var input = instance.parent().find('.dataTables_filter input');",
+  "  input.off('keyup search input').on('keyup', function(){",
+  "    var keyword = input.val().replace('1','Ӏ');",
+  "    // we search in column 4",
+  "    table.column(4).search(keyword, true, false).draw();",
+  "  });",
+  "}"
+)
+
+js_callback <- "
+  table.column(1).nodes().to$().css({cursor: 'pointer'});
+  var format = function(d) {
+    return '<div style=\"padding: .5em;\">forms: ' + d[1] + 
+           '<br>additional forms: ' + d[2] + 
+           '<br>context: ' + d[3] + 
+           '<br>meaning: ' + d[4] + '</div>';
+  };
+  table.on('click', 'td.details-control', function() {
+    var td = $(this), row = table.row(td.closest('tr'));
+    if (row.child.isShown()) {
+      row.child.hide();
+      td.html('&oplus;');
+    } else {
+      row.child(format(row.data())).show();
+      td.html('&CircleMinus;');
+    }
+  });"
+
+
 read_csv("data/data.csv", show_col_types = FALSE) %>%
   mutate_all(function(i){ifelse(is.na(i), "", i)}) %>% 
-  mutate(tooltip = str_c(prs, form2, form3, additional_forms, sep = "; "),
+  mutate(tooltip = str_c(prs, form2, form3, sep = "; "),
          tooltip = str_remove(tooltip, "^; "),
          tooltip = str_remove(tooltip, ";$"),
-         tooltip_russian = str_c(meaning, context, sep = "; "),
+         more = '&oplus;',
          tooltip_id = str_c(str_c("kk:&nbsp;", kk), 
                             str_c("jena200:&nbsp;", jena200), 
-                            str_c("gld110:&nbsp;", gld110), sep = "; "),
-         orthography = glue('<a href="#" data-tooltip data-tooltip-message="{tooltip}">{orthography}</a>'),
-         Russian = glue('<a href="#" data-tooltip data-tooltip-message="{tooltip_russian}">{Russian}</a>'),
+                            str_c("gld110:&nbsp;", gld110), sep = " "),
          id = glue('<a href="#" data-tooltip data-tooltip-message="{tooltip_id}">{id}</a>')) %>% 
-  select(-prs, -form2, -form3, -additional_forms, -tooltip, -meaning, -context, -tooltip_russian, -tooltip_id, -kk, -jena200, -gld110) %>% 
-  DT::datatable(filter = 'top', rownames = FALSE, options = list(pageLength = 10, dom = 'tip'), escape = FALSE)
+  select(more, tooltip, additional_forms, meaning, context, id, Russian, English, orthography, transcription, pos) %>% 
+  datatable(filter = 'top', rownames = FALSE, escape = FALSE,
+            colnames = c("", "tooltip", "additional_forms", "meaning", "context", "id", "Russian", "English", "orthography", "transcription", "pos"),
+            options = list(pageLength = 10, dom = 'top', 
+                           initComplete = JS(js_initComplete),
+                           columnDefs = list(
+                             list(visible = FALSE, targets = c(1, 2, 3, 4)),
+                             list(orderable = FALSE, className = 'details-control', targets = 0))),
+            callback = JS(js_callback))
 ```
 
 
