@@ -26,7 +26,8 @@ article_citation <- BibEntry(bibtype = 'misc',
  year='2023',
  publisher='Linguistic Convergence Laboratory, NRU HSE',
  address='Moscow',
- url='http://lingconlab.ru/TukitaDict/')
+ url='http://lingconlab.ru/TukitaDict/',
+ doi='10.5281/zenodo.7803955')
 ```
 
 ::: {.panel-tabset}
@@ -71,5 +72,3 @@ read_csv("data/data.csv", show_col_types = FALSE) %>%
                              list(orderable = FALSE, className = 'details-control', targets = 0))),
             callback = JS(readLines("plus.js")))
 ```
-
-
