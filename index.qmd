@@ -1,6 +1,8 @@
 ---
 title: "Dictionary of Tukita"
-format: html
+format: 
+  html:
+    page-layout: full
 editor: source
 css: styles.css
 editor_options: 
